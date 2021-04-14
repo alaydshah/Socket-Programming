@@ -18,6 +18,7 @@ using namespace std;
 #define HOSTNAME "localhost"
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 
+
 void *get_in_addr(struct sockaddr *sa);
 
 int main(int argc, char *argv[])

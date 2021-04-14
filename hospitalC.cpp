@@ -23,19 +23,19 @@ Server server;
 
 #define HOST_NAME "localhost" // hostname
 #define SCHEDULER_PORT "33819" // hostname
-#define UDP_PORT "30819"
+#define UDP_PORT "32819"
 
 int main(void)
 {
     const int udp_sockfd = server.createSocket("UDP", UDP_PORT);
-    server.sendUDPPacket("A", SCHEDULER_PORT);
-    cout << "Hospital A Sent Initial Occupancy to scheduler" <<endl;
+    server.sendUDPPacket("C", SCHEDULER_PORT);
+    cout << "Hospital C Sent Initial Occupancy to scheduler" <<endl;
     while (true) {
         string location_request = server.receiveUDPPacket(udp_sockfd);
-        cout << "Hospital A Locating Request received from scheduler:" << location_request << endl;
-        server.sendUDPPacket("Score: 0", SCHEDULER_PORT);
+        cout << "Hospital C Locating Request received from scheduler:" << location_request << endl;
+        server.sendUDPPacket("Score: 2", SCHEDULER_PORT);
         string assignment = server.receiveUDPPacket(udp_sockfd);
-        cout << "Hospital A Assignment received from scheduler:" << assignment << endl;
+        cout << "Hospital C Assignment received from scheduler:" << assignment << endl;
     }
     return 0;
 }
