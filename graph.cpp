@@ -1,4 +1,5 @@
 //g++ -std=c++11 -o trial.o trial.cpp
+
 #include <bits/stdc++.h>
 #include <algorithm>
 #include <iostream>
@@ -8,52 +9,26 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "Graph.h"
+
 using namespace std;
 
-// iPair ==> Integer Pair
 typedef pair<float, string> Pair;
 typedef pair<string, string> Edge;
 string MAP_FILE_NAME = "map.txt";
 float INF = 2147483647;
 
-class Graph
-{
-	// In a weighted graph, we need to store vertex
-	// and weight pair for every edge
-    std::string source;
-
-    private:
-        std::map<string, list<Pair>> adjMap;
-        std::set<Edge> edges;
-        std::map<string, float> distMap;
-
-    public:
-        Graph(string source, string destination); // Constructor
-
-        // function to add an edge to graph
-        void construct_graph();
-        void printGraph();
-        float getShortestPath(string);        
-
-    private:
-        void addEdge(string u, string v, float w);
-        void runDijkstra(string);
-
-
-	// prints shortest path from s
-	// void shortestPath(int s);
-};
-
 // Constructor
-Graph::Graph(string s, string d)
+Graph::Graph(string s)
 {
-    this->construct_graph();
+    this->constructGraph();
     this->runDijkstra(s);
-    this->printGraph();
-    this->getShortestPath(d);
+    cout << "source: " << s << endl;
+    // this->printGraph();
+    // this->getShortestPath(d);
 }
 
-void Graph::construct_graph() {
+void Graph::constructGraph() {
     string line;
     ifstream file(MAP_FILE_NAME);
 
@@ -62,7 +37,6 @@ void Graph::construct_graph() {
         return;
     }    
     while (getline(file, line)) {
-        // std::string s = "split on    whitespace   "; 
         std::vector<std::string> result; 
         std::istringstream iss(line); 
         for(std::string line; iss >> line;) {
@@ -102,8 +76,7 @@ void Graph::runDijkstra(string src) {
 		// vertex, extract it from priority queue.
 		// vertex label is stored in second of pair (it
 		// has to be done this way to keep the vertices
-		// sorted distance (distance must be first item
-		// in pair)
+		// sorted distance (distance must be first item in pair)
 		string vertex = pq.top().second;
 		pq.pop();
 		visited.insert(vertex);
@@ -115,7 +88,7 @@ void Graph::runDijkstra(string src) {
             string n_vertex = pair.second;
 
             if ((visited.find(n_vertex) == visited.end()) && distMap[n_vertex] > distMap[vertex] + weight) {
-                				// Updating distance of v
+                // Updating distance of v
 				distMap[n_vertex] = distMap[vertex] + weight;
 				pq.push(make_pair(distMap[n_vertex], n_vertex));
             }
@@ -123,12 +96,17 @@ void Graph::runDijkstra(string src) {
 	}
 }
 
-float Graph::getShortestPath(string destination) {
-    cout << distMap[destination] << endl;
-    return distMap[destination];
+bool Graph::vertexExists(string vertex) {
+   if (distMap.find(vertex) == distMap.end()) {
+       return false;
+   }
+   return true;
 }
 
-
+float Graph::getShortestPath(string destination) {
+    // cout << distMap[destination] << endl;
+    return distMap[destination];
+}
 
 void Graph::printGraph() {
     map<string, list<Pair>>::iterator it;
@@ -157,13 +135,4 @@ void Graph::printGraph() {
             << std::endl;
     }
 
-}
-
-int main(int argc, char *argv[])
-{
-    if (argc != 3) {
-        fprintf(stderr,"usage: graph <source> <destination>\n");
-        exit(1);
-    }
-    Graph g(argv[1], argv[2]);
 }
