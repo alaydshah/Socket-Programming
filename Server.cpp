@@ -111,9 +111,10 @@ string Server::receiveUDPPacket(int sockfd) {
         return message;  
 }
 
-void Server::sendUDPPacket(string message, const char * port_number) {
-        int sockfd;
-        struct addrinfo hints, *servinfo, *p;
+void Server::sendUDPPacket(int sockfd, string message, const char * port_number) {
+
+        // int sockfd;
+        struct addrinfo hints, *pAddr;
         int rv;
         int numbytes;
         char s[INET6_ADDRSTRLEN];
@@ -123,39 +124,24 @@ void Server::sendUDPPacket(string message, const char * port_number) {
         hints.ai_socktype = SOCK_DGRAM;
         hints.ai_flags = AI_PASSIVE; // use my IP        
 
-        if ((rv = getaddrinfo(HOST_NAME.c_str(), port_number, &hints, &servinfo)) != 0) {
+        if ((rv = getaddrinfo(HOST_NAME.c_str(), port_number, &hints, &pAddr)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
             return;
         }
 
-        for(p = servinfo; p != NULL; p = p->ai_next) {
-            if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                    p->ai_protocol)) == -1) {
-                perror("talker: socket");
-                continue;
-            }
-
-            break;
-        }
-
-        if (p == NULL) {
-            fprintf(stderr, "talker: failed to create socket\n");
-            return;
-        }
-
-        inet_ntop(p->ai_family, this->get_in_addr((struct sockaddr *)p->ai_addr),
+        inet_ntop(pAddr->ai_family, this->get_in_addr((struct sockaddr *)pAddr->ai_addr),
                 s, sizeof s);
 
-        freeaddrinfo(servinfo);
 
         if ((numbytes = sendto(sockfd, message.c_str(), strlen(message.c_str()), 0,
-                p->ai_addr, p->ai_addrlen)) == -1) {
+                pAddr->ai_addr, pAddr->ai_addrlen)) == -1) {
             perror("talker: sendto");
+            freeaddrinfo(pAddr);
             ::exit(1);
         }
 
         printf("talker: sent %d bytes to %s\n", numbytes, s);
-        close(sockfd);
+        freeaddrinfo(pAddr);
 }
 
 string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
@@ -179,7 +165,6 @@ string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
         perror("sigaction");
         ::exit(1);
     }    
-
 
     sin_size = sizeof their_addr;
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);

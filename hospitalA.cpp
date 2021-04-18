@@ -28,12 +28,12 @@ Server server;
 int main(void)
 {
     const int udp_sockfd = server.createSocket("UDP", UDP_PORT);
-    server.sendUDPPacket("A", SCHEDULER_PORT);
+    server.sendUDPPacket(udp_sockfd, "A", SCHEDULER_PORT);
     cout << "Hospital A Sent Initial Occupancy to scheduler" <<endl;
     while (true) {
         string location_request = server.receiveUDPPacket(udp_sockfd);
         cout << "Hospital A Locating Request received from scheduler:" << location_request << endl;
-        server.sendUDPPacket("Score: 0", SCHEDULER_PORT);
+        server.sendUDPPacket(udp_sockfd, "Score: 0", SCHEDULER_PORT);
         string assignment = server.receiveUDPPacket(udp_sockfd);
         cout << "Hospital A Assignment received from scheduler:" << assignment << endl;
     }

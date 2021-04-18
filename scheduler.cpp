@@ -30,11 +30,11 @@ void *get_in_addr(struct sockaddr *sa);
 int request_score(string);
 void getInitialOccupancy(int);
 string getClientRequest(const int, int*);
-void sendLocationToHospital(string);
+void sendLocationToHospital(int, string);
 void receiveScores(int);
 string makeAssignment(int*);
 void sendAssignmentToClient(int, string);
-void sendAssignmentToHospital(int);
+void sendAssignmentToHospital(int, int);
 
 
 // enum Socket_Type { TCP, UDP };
@@ -54,13 +54,13 @@ int main(void)
     while (true) {
         int child_sockfd;
         string location = getClientRequest(tcp_sockfd, &child_sockfd);
-        sendLocationToHospital(location);
+        sendLocationToHospital(udp_sockfd, location);
         receiveScores(udp_sockfd);
         int hospital_loc;
         string assignment = makeAssignment(&hospital_loc);
         sendAssignmentToClient(child_sockfd, assignment);
         cout << "Assignment Sent to Client" << endl;
-        sendAssignmentToHospital(hospital_loc);
+        sendAssignmentToHospital(udp_sockfd, hospital_loc);
         cout << "Assignment Sent to Hospitals" << endl;
         close(child_sockfd);
     }    
@@ -82,9 +82,9 @@ string getClientRequest(const int sockfd, int * child_sockfd) {
     return location;    
 }
 
-void sendLocationToHospital(string location) {
+void sendLocationToHospital(int udp_sockfd, string location) {
     for(int i=0; i<NUM_HOSPITALS; i++) {
-        server.sendUDPPacket(location, Port_Number[hospitals[i]]);
+        server.sendUDPPacket(udp_sockfd, location, Port_Number[hospitals[i]]);
     }
 }
 
@@ -104,7 +104,7 @@ void sendAssignmentToClient(int sockfd, string assignment) {
     server.respondTCPRequest(assignment, sockfd);
 };
 
-void sendAssignmentToHospital(int hospital_loc) {
+void sendAssignmentToHospital(int udp_sockfd, int hospital_loc) {
         string message="Client Assigned";
-        server.sendUDPPacket(message, Port_Number[hospitals[hospital_loc]]);        
+        server.sendUDPPacket(udp_sockfd, message, Port_Number[hospitals[hospital_loc]]);        
 }
