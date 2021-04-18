@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <sstream>
 
 #include "Server.h"
 
@@ -84,7 +85,10 @@ string getClientRequest(const int sockfd, int * child_sockfd) {
 
 void sendLocationToHospital(int udp_sockfd, string location) {
     for(int i=0; i<NUM_HOSPITALS; i++) {
-        server.sendUDPPacket(udp_sockfd, location, Port_Number[hospitals[i]]);
+        std::stringstream msg;
+        msg << "Query:" << location;
+        cout << "Query message to be sent to client:" << msg.str() << endl;
+        server.sendUDPPacket(udp_sockfd, msg.str(), Port_Number[hospitals[i]]);
     }
 }
 
@@ -105,6 +109,6 @@ void sendAssignmentToClient(int sockfd, string assignment) {
 };
 
 void sendAssignmentToHospital(int udp_sockfd, int hospital_loc) {
-        string message="Client Assigned";
+        string message="Assigned";
         server.sendUDPPacket(udp_sockfd, message, Port_Number[hospitals[hospital_loc]]);        
 }

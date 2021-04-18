@@ -1,41 +1,32 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <sys/wait.h>
-#include <signal.h>
-
 #include <iostream>
 #include <string>
-#include <map>
-
-#include "Server.h"
+#include "Hospital.h"
 
 using namespace std;
 
 Server server;
 
-#define HOST_NAME "localhost" // hostname
-#define SCHEDULER_PORT "33819" // hostname
 #define UDP_PORT "30819"
+#define HOSPITAL "A"
 
-int main(void)
+int main(int argc, char *argv[])
 {
-    const int udp_sockfd = server.createSocket("UDP", UDP_PORT);
-    server.sendUDPPacket(udp_sockfd, "A", SCHEDULER_PORT);
-    cout << "Hospital A Sent Initial Occupancy to scheduler" <<endl;
+
+    if (argc != 4) {
+        fprintf(stderr,"usage: ./hospitalA <location A> <total capacity A> <initial occupancy A>\n");
+        exit(1);
+    }    
+
+    string location = argv[1];
+    int capacity = stoi(argv[2]);
+    int occupancy = stoi(argv[3]);
+
+    Hospital hospital (HOSPITAL, location, capacity, occupancy, UDP_PORT);
+
     while (true) {
-        string location_request = server.receiveUDPPacket(udp_sockfd);
-        cout << "Hospital A Locating Request received from scheduler:" << location_request << endl;
-        server.sendUDPPacket(udp_sockfd, "Score: 0", SCHEDULER_PORT);
-        string assignment = server.receiveUDPPacket(udp_sockfd);
-        cout << "Hospital A Assignment received from scheduler:" << assignment << endl;
+        string message = hospital.listen();
+        hospital.act(message);
     }
+
     return 0;
 }
