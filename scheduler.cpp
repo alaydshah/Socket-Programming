@@ -11,10 +11,12 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#include <bits/stdc++.h>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <map>
+#include <queue>
 
 #include "Server.h"
 
@@ -28,26 +30,20 @@ using namespace std;
 
 void sigchld_handler(int s);
 void *get_in_addr(struct sockaddr *sa);
+void messageParser(string, string&, string&, string&);
 int request_score(string);
 void getInitialOccupancy(int);
 string getClientRequest(const int, int*);
 int sendLocationToHospital(int, string);
-void receiveScores(int, int);
-string makeAssignment(int*);
-void sendAssignmentToClient(int, string);
-void sendAssignmentToHospital(int, int);
-void messageParser(string, string&, string&, string&);
+void receiveScores(int, int, string&);
+void assign(int, int, string);
 
-
-// enum Socket_Type { TCP, UDP };
-typedef pair<int, int> Occupancy;
+typedef pair<float, float> score;
 enum Ports {UDP = 0, TCP, Hospital_A, Hospital_B, Hospital_C};
-Ports hospitals[3]  = {Hospital_A, Hospital_B, Hospital_C};
 string hospital_names[3] = {"Hospital A", "Hospital B", "Hospital C"};
+map<string, Ports> hospitalPort = { {"Hospital A",Hospital_A}, {"Hospital B",Hospital_B}, {"Hospital C", Hospital_C}};
 const char* Port_Number[] = {"33819", "34819", "30819", "31819", "32819"};
 map<string, int> book_keep;
-
-// map<std::string,Ports> hospital_map = { {"A",Hospital_A}, {"B",Hospital_B}, {"C", Hospital_C}};
 
 Server server;
 
@@ -61,16 +57,11 @@ int main(void)
         int child_sockfd;
         string location = getClientRequest(tcp_sockfd, &child_sockfd);
         int num_hospitals_sent = sendLocationToHospital(udp_sockfd, location);
-        receiveScores(udp_sockfd, num_hospitals_sent);
-        int hospital_loc;
-        string assignment = makeAssignment(&hospital_loc);
-        sendAssignmentToClient(child_sockfd, assignment);
-        cout << "Assignment Sent to Client" << endl;
-        sendAssignmentToHospital(udp_sockfd, hospital_loc);
-        cout << "Assignment Sent to Hospitals" << endl;
+        string assigned_hospital = "None";
+        receiveScores(udp_sockfd, num_hospitals_sent, assigned_hospital);
+        assign(child_sockfd, udp_sockfd, assigned_hospital);
         close(child_sockfd);
     }    
-    cout << "Exited While Loop" << endl;
     return 0;
 }
 
@@ -82,7 +73,6 @@ void getInitialOccupancy(int sockfd){
         messageParser(message, sender, capacity, occupation);
         book_keep[sender] = stoi(capacity) - stoi(occupation);
         printf("The Scheduler has received information from %s: total capacity is %s and initial occupancy is %s\n", sender.c_str(), capacity.c_str(), occupation.c_str());
-        // printf("listener: packet contains \"%s\"\n", location.c_str());
     }
 }
 
@@ -101,7 +91,7 @@ void messageParser(string s, string& sender, string& var1, string& var2 ) {
 
 string getClientRequest(const int sockfd, int * child_sockfd) {
     string location = server.receiveTCPRequest(sockfd, child_sockfd);
-    printf("The Scheduler has received client at location %s from the client using TCP over port %s", location.c_str(), Port_Number[TCP]);
+    printf("The Scheduler has received client at location %s from the client using TCP over port %s\n", location.c_str(), Port_Number[TCP]);
     return location;    
 }
 
@@ -113,31 +103,51 @@ int sendLocationToHospital(int udp_sockfd, string location) {
         if (remaining_capacity > 0) {
             std::stringstream msg;
             msg << "Query:" << location;
-            server.sendUDPPacket(udp_sockfd, msg.str(), Port_Number[hospitals[i]]);            
-            printf("The Schediler has sent client location to %s using UDP over port %s", hospital.c_str(), Port_Number[UDP]);
+            server.sendUDPPacket(udp_sockfd, msg.str(), Port_Number[hospitalPort[hospital]]);            
+            printf("The Scheduler has sent client location to %s using UDP over port %s\n", hospital.c_str(), Port_Number[UDP]);
             counter++;
         }
     }
     return counter;
 }
 
-void receiveScores(int sockfd, int num_hospitals_sent) {
+void receiveScores(int sockfd, int num_hospitals_sent, string& assigned_hospital) {
+    float best_score = INT_MIN;
+    float best_distance = INT_MAX;
+    bool flag = false;
+
     for(int i=0; i<num_hospitals_sent; i++) {
-        string score = server.receiveUDPPacket(sockfd);
-        printf("Recieved Score: \"%s\"\n", score.c_str());
+        string message = server.receiveUDPPacket(sockfd);
+        string sender, score, distance;
+        messageParser(message, sender, score, distance);
+        printf("The Scheduler has received map information from %s, the score = %s and the distance = %s\n", sender.c_str(), score.c_str(), distance.c_str());
+        if (distance == "None") {
+            assigned_hospital = "Not Found";
+            flag = true;
+        }
+        if (score != "None" and !flag) {
+            if (stof(score) > best_score) {
+                best_score = stof(score);
+                best_distance = stof(distance);
+                assigned_hospital = hospital_names[i];
+            }
+            else if (stof(score) == best_score && stof(distance) < best_distance) {
+                best_distance = stof(distance);
+                assigned_hospital = hospital_names[i];
+            }
+        }
     }
 }
 
-string makeAssignment(int* hosp_loc) {
-    *hosp_loc = 0;
-    return "Hospital A";
-}
+void assign(int tcp_sockfd, int udp_sockfd, string assigned_hospital) {
 
-void sendAssignmentToClient(int sockfd, string assignment) {
-    server.respondTCPRequest(assignment, sockfd);
-};
+    printf("The Scheduler has assigned %s to the client\n", assigned_hospital.c_str());
+    server.respondTCPRequest(assigned_hospital, tcp_sockfd);
+    printf("The Scheduler has sent the result to client using TCP over port %s\n", Port_Number[TCP]);
 
-void sendAssignmentToHospital(int udp_sockfd, int hospital_loc) {
-        string message="Assigned";
-        server.sendUDPPacket(udp_sockfd, message, Port_Number[hospitals[hospital_loc]]);        
+    if (assigned_hospital != "None" && assigned_hospital != "Not Found") {
+        server.sendUDPPacket(udp_sockfd, "Assigned", Port_Number[hospitalPort[assigned_hospital]]);
+        book_keep[assigned_hospital] += 1;
+        printf("The Scheduler has sent the result to %s using UDP over port %s\n", assigned_hospital.c_str(), Port_Number[UDP]);
+    }
 }

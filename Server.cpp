@@ -101,11 +101,11 @@ string Server::receiveUDPPacket(int sockfd) {
             perror("recvfrom");
             ::exit(1);
         }
-        printf("listener: got packet from %s\n",
-            inet_ntop(their_addr.ss_family,
-                this->get_in_addr((struct sockaddr *)&their_addr),
-                s, sizeof s));
-        printf("listener: packet is %d bytes long\n", numbytes);
+        // printf("listener: got packet from %s\n",
+            // inet_ntop(their_addr.ss_family,
+            //     this->get_in_addr((struct sockaddr *)&their_addr),
+            //     s, sizeof s));
+        // printf("listener: packet is %d bytes long\n", numbytes);
         buf[numbytes] = '\0';
         string message = string(buf);
         return message;  
@@ -140,7 +140,7 @@ void Server::sendUDPPacket(int sockfd, string message, const char * port_number)
             ::exit(1);
         }
 
-        printf("talker: sent %d bytes to %s\n", numbytes, s);
+        // printf("talker: sent %d bytes to %s\n", numbytes, s);
         freeaddrinfo(pAddr);
 }
 
@@ -176,7 +176,7 @@ string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
     inet_ntop(their_addr.ss_family,
         this->get_in_addr((struct sockaddr *)&their_addr),
         s, sizeof s);
-    printf("server: got connection from %s\n", s);
+    // printf("server: got connection from %s\n", s);
 
     if ((numbytes = recv(new_fd, buf, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");
@@ -198,7 +198,7 @@ void Server::respondTCPRequest(string response, int sockfd){
         perror("send");
         ::exit(1);
     }
-    printf("Scheduler assigned %s to client", response.c_str());    
+    // printf("Scheduler assigned %s to client", response.c_str());    
 }
 
 void * Server::get_in_addr(struct sockaddr *sa)
