@@ -52,12 +52,13 @@ string Hospital::listen() {
 
 string Hospital::createMessage(string var1, string var2, int type) {
     std::stringstream msg;
-    if (type == Occupancy) {
-        msg << this->hospital << "->" << "Occupancy:" << var1 << "," << var2;
-    }
-    else {
-        msg << this->hospital << "->" << "Score:" << var1 << "," << var2;
-    }
+    msg << "Hospital " << this->hospital << ":" << var1 << "," << var2;    
+    // if (type == Occupancy) {
+        
+    // }
+    // else {
+    //     msg << this->hospital << ":" << var1 << "," << var2;
+    // }
     return msg.str();
 }
 
