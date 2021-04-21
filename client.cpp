@@ -67,21 +67,17 @@ int main(int argc, char *argv[])
 
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
-    printf("client: connecting to %s\n", s);
+    
+    printf("The client is up and running\n");
 
     freeaddrinfo(servinfo); // all done with this structure
-
-    // if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 
     if (send(sockfd, argv[1], strlen(argv[1]), 0) == -1) {
         perror("send");
         exit(1);
     }
 
-    // buf[numbytes] = '\0';
-
-    // printf("client: sent '%s'\n",buf);
-    printf("client sent location to scheduler residing at %s\n", s);
+    printf("The client has sent query to Scheduler using TCP: client location %s\n", argv[1]);
 
     if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");
@@ -90,7 +86,17 @@ int main(int argc, char *argv[])
 
     buf[numbytes] = '\0';
 
-    printf("client assigned %s by scheduler\n", buf);
+    string assignment(buf);
+
+    if (assignment == "Not Found") {
+        printf("Location %s not found\n", argv[1]);
+    }
+    else if (assignment == "None") {
+        printf("The client has received results from the Scheduler: assigned to Hospital %s\n", buf);
+    }
+    else {
+        printf("The client has received results from the Scheduler: assigned to %s\n", buf);
+    }
 
     close(sockfd);
 

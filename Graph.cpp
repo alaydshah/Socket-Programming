@@ -23,9 +23,6 @@ Graph::Graph(string s)
 {
     this->constructGraph();
     this->runDijkstra(s);
-    cout << "source: " << s << endl;
-    // this->printGraph();
-    // this->getShortestPath(d);
 }
 
 void Graph::constructGraph() {
@@ -42,7 +39,6 @@ void Graph::constructGraph() {
         for(std::string line; iss >> line;) {
             result.push_back(line); 
         }
-        // cout << result[0] << "::" << result[1] << ":" << stof(result[2]) << endl;
         this->addEdge(result[0], result[1], stod(result[2]));
     }
 }
@@ -104,7 +100,6 @@ bool Graph::vertexExists(string vertex) {
 }
 
 float Graph::getShortestPath(string destination) {
-    // cout << distMap[destination] << endl;
     return distMap[destination];
 }
 
