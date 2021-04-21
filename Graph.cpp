@@ -16,7 +16,7 @@ using namespace std;
 typedef pair<float, string> Pair;
 typedef pair<string, string> Edge;
 string MAP_FILE_NAME = "map.txt";
-float INF = 2147483647;
+// float INF = 2147483647;
 
 // Constructor
 Graph::Graph(string s)
@@ -53,8 +53,8 @@ void Graph::addEdge(string u, string v, float w)
         adjMap[v].push_back(make_pair(w, u));
         edges.insert(make_pair(u,v));
         edges.insert(make_pair(v,u));
-        distMap[u] = INF;
-        distMap[v] = INF;
+        distMap[u] = INT_MAX;
+        distMap[v] = INT_MAX;
     }
 }
 
