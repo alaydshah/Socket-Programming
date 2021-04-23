@@ -15,7 +15,7 @@ class Hospital {
         void bootUp();
         void sendInitialOccupancy();
         void resolveQuery(string);
-        string createMessage(string, string, int);
+        string createMessage(string, string);
         string getDistance(string);
         string computeScore(string);
         float getAvailability();
