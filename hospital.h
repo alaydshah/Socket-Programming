@@ -12,13 +12,8 @@ class Hospital {
         string hospital, destination;
         Graph graph;
         Server server;
-
-    public:
-        Hospital(string, string, int, int, const char*);
         void bootUp();
         void sendInitialOccupancy();
-        string listen();
-        void act(string);
         void resolveQuery(string);
         string createMessage(string, string, int);
         string getDistance(string);
@@ -26,4 +21,9 @@ class Hospital {
         float getAvailability();
         void printGraph();
         void updateAssignment();
+
+    public:
+        Hospital(string, string, int, int, const char*);
+        string listen();
+        void act(string);
 };
