@@ -109,9 +109,9 @@ void Graph::printGraph() {
     for (it = adjMap.begin(); it != adjMap.end(); it++)
     {
         for (auto pair : it->second) {
-            std::cout << it->first    // string (key)
+            std::cout << it->first
               << ':'
-              << pair.first   // string's value 
+              << pair.first   
               << ':'
               << pair.second
               << std::endl;
@@ -124,7 +124,7 @@ void Graph::printGraph() {
 
     for (it2 = distMap.begin(); it2 != distMap.end(); it2++)
     {
-        std::cout << it2->first    // string (key)
+        std::cout << it2->first 
             << ':'
             << it2->second
             << std::endl;

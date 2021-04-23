@@ -20,7 +20,7 @@
 
 using namespace std;
 
-#define SCHEDULER_PORT "33819" // hostname
+#define SCHEDULER_PORT "33819"
 enum MessageType {Occupancy = 0, Score};
 
 Hospital::Hospital(string hospital, string location, int capacity, int occupancy, const char * port_number) : graph(location){
@@ -58,8 +58,8 @@ string Hospital::createMessage(string var1, string var2, int type) {
 void Hospital::act(string s) {
     string delimiter = ":";
     int split_index = s.find(delimiter);
-    string token_1 = s.substr(0, split_index); // token is "scott"
-    string location = s.substr(split_index+1, s.length()); // token is "scott"
+    string token_1 = s.substr(0, split_index); 
+    string location = s.substr(split_index+1, s.length());
 
     if (token_1 == "Query") {
         printf ("Hospital %s has received input from client at location %s \n", this->hospital.c_str(), location.c_str());
@@ -115,7 +115,6 @@ string Hospital::computeScore(string source) {
         return "None";
     }
 
-    cout << "a:" << a << " " << "d:" << d << endl;
     float score = 1 / (d*(1.1-a));
     return to_string(score);
 }

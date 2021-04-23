@@ -20,7 +20,6 @@ using namespace std;
 
 void sigchld_handler(int s)
 {
-    // waitpid() might overwrite errno, so we save and restore it:
     int saved_errno = errno;
     while(waitpid(-1, NULL, WNOHANG) > 0);
     errno = saved_errno;
@@ -40,7 +39,7 @@ const int Server::createSocket(string sockType, const char * port_number) {
     int yes=1;
 
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; // set to AF_INET to use IPv4
+    hints.ai_family = AF_UNSPEC; 
     if (!sockType.compare("UDP")) {
         hints.ai_socktype = SOCK_DGRAM;
     }
@@ -48,7 +47,7 @@ const int Server::createSocket(string sockType, const char * port_number) {
         hints.ai_socktype = SOCK_STREAM;
     }
 
-    hints.ai_flags = AI_PASSIVE; // use my IP
+    hints.ai_flags = AI_PASSIVE;
 
     if ((rv = getaddrinfo(HOST_NAME.c_str(), port_number, &hints, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -101,11 +100,6 @@ string Server::receiveUDPPacket(int sockfd) {
             perror("recvfrom");
             ::exit(1);
         }
-        // printf("listener: got packet from %s\n",
-            // inet_ntop(their_addr.ss_family,
-            //     this->get_in_addr((struct sockaddr *)&their_addr),
-            //     s, sizeof s));
-        // printf("listener: packet is %d bytes long\n", numbytes);
         buf[numbytes] = '\0';
         string message = string(buf);
         return message;  
@@ -113,16 +107,15 @@ string Server::receiveUDPPacket(int sockfd) {
 
 void Server::sendUDPPacket(int sockfd, string message, const char * port_number) {
 
-        // int sockfd;
         struct addrinfo hints, *pAddr;
         int rv;
         int numbytes;
         char s[INET6_ADDRSTRLEN];
 
         memset(&hints, 0, sizeof hints);
-        hints.ai_family = AF_UNSPEC; // set to AF_INET to use IPv4
+        hints.ai_family = AF_UNSPEC; 
         hints.ai_socktype = SOCK_DGRAM;
-        hints.ai_flags = AI_PASSIVE; // use my IP        
+        hints.ai_flags = AI_PASSIVE;        
 
         if ((rv = getaddrinfo(HOST_NAME.c_str(), port_number, &hints, &pAddr)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -140,13 +133,12 @@ void Server::sendUDPPacket(int sockfd, string message, const char * port_number)
             ::exit(1);
         }
 
-        // printf("talker: sent %d bytes to %s\n", numbytes, s);
         freeaddrinfo(pAddr);
 }
 
 string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
-    int new_fd, numbytes;  // listen on sock_fd, new connection on new_fd
-    struct sockaddr_storage their_addr; // connector's address information
+    int new_fd, numbytes;  
+    struct sockaddr_storage their_addr;
     socklen_t sin_size;
     struct sigaction sa;
     char buf[MAXDATASIZE];
@@ -176,7 +168,6 @@ string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
     inet_ntop(their_addr.ss_family,
         this->get_in_addr((struct sockaddr *)&their_addr),
         s, sizeof s);
-    // printf("server: got connection from %s\n", s);
 
     if ((numbytes = recv(new_fd, buf, MAXDATASIZE-1, 0)) == -1) {
         perror("recv");
@@ -198,7 +189,6 @@ void Server::respondTCPRequest(string response, int sockfd){
         perror("send");
         ::exit(1);
     }
-    // printf("Scheduler assigned %s to client", response.c_str());    
 }
 
 void * Server::get_in_addr(struct sockaddr *sa)
