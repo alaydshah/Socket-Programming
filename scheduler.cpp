@@ -129,7 +129,7 @@ void receiveScores(int sockfd, int num_hospitals_sent, string& assigned_hospital
             if (stof(score) > best_score) {
                 best_score = stof(score);
                 best_distance = stof(distance);
-                assigned_hospital = hospital_names[i];
+                assigned_hospital = sender;
             }
             else if (stof(score) == best_score && stof(distance) < best_distance) {
                 best_distance = stof(distance);
@@ -147,7 +147,7 @@ void assign(int tcp_sockfd, int udp_sockfd, string assigned_hospital) {
 
     if (assigned_hospital != "None" && assigned_hospital != "Not Found") {
         server.sendUDPPacket(udp_sockfd, "Assigned", Port_Number[hospitalPort[assigned_hospital]]);
-        book_keep[assigned_hospital] += 1;
+        book_keep[assigned_hospital] -= 1;
         printf("The Scheduler has sent the result to %s using UDP over port %s\n", assigned_hospital.c_str(), Port_Number[UDP]);
     }
 }

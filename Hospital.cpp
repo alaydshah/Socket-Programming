@@ -41,7 +41,6 @@ void Hospital::bootUp() {
 void Hospital::sendInitialOccupancy() {
     printf ("Hospital %s has total capacity %d and initial occupancy %d.\n", this->hospital.c_str(), this->capacity, this->occupancy);
     string msg = createMessage(to_string(this->capacity), to_string(this->occupancy), Occupancy);
-    // cout << msg << endl;
     server.sendUDPPacket(sockfd, msg, SCHEDULER_PORT);
 }
 
@@ -52,13 +51,7 @@ string Hospital::listen() {
 
 string Hospital::createMessage(string var1, string var2, int type) {
     std::stringstream msg;
-    msg << "Hospital " << this->hospital << ":" << var1 << "," << var2;    
-    // if (type == Occupancy) {
-        
-    // }
-    // else {
-    //     msg << this->hospital << ":" << var1 << "," << var2;
-    // }
+    msg << "Hospital " << this->hospital << ":" << var1 << "," << var2;
     return msg.str();
 }
 
@@ -78,12 +71,12 @@ void Hospital::act(string s) {
 }
 
 void Hospital::resolveQuery(string location) {
-    float availability = this->getAvailability();
-    string distance = this->getDistance(location);
-    string score = this->computeScore(location);
-    string msg = createMessage(score, distance, Score);
 
     if (this->graph.vertexExists(location)) {
+        float availability = this->getAvailability();
+        string distance = this->getDistance(location);
+        string score = this->computeScore(location);
+        string msg = createMessage(score, distance, Score);
         printf("Hospital %s has capacity = %d, occupation = %d, availability = %f\n", this->hospital.c_str(), this->capacity, this->occupancy, availability);
         printf("Hospital %s has found the shortest path to client, distance = %s\n", this->hospital.c_str(), distance.c_str());
         printf("Hospital %s has the score = %s\n", this->hospital.c_str(), score.c_str());
@@ -91,6 +84,7 @@ void Hospital::resolveQuery(string location) {
         printf("Hospital %s has sent score = %s and distance = %s to the Scheduler\n", this->hospital.c_str(), score.c_str(), distance.c_str());
     }
     else {
+        string msg = createMessage("None", "None", Score);
         printf("Hospital %s does not have the location %s in map\n", this->hospital.c_str(), location.c_str());
         server.sendUDPPacket(sockfd, msg, SCHEDULER_PORT);        
         printf("Hospital %s has sent \"location not found\" to the Scheduler\n", this->hospital.c_str());
@@ -128,6 +122,13 @@ string Hospital::computeScore(string source) {
 
 void Hospital::updateAssignment() {
     occupancy++;
-    float availability = getAvailability();
-    printf("Hospital %s has been assigned to a client, occupation is updated to %d, availability is updated to %f\n", this->hospital.c_str(), occupancy, availability);
+    float a = getAvailability();
+    string availability;
+    if (a  < 0 || a > 1) {
+        availability = "None";
+    }
+    else {
+        availability = to_string(a);
+    }
+    printf("Hospital %s has been assigned to a client, occupation is updated to %s, availability is updated to %s\n", this->hospital.c_str(), to_string(occupancy).c_str(), availability.c_str());
 }

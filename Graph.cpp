@@ -82,7 +82,7 @@ void Graph::runDijkstra(string src) {
         for (auto pair : adjMap[vertex]) {
             float weight = pair.first;
             string n_vertex = pair.second;
-
+            
             if ((visited.find(n_vertex) == visited.end()) && distMap[n_vertex] > distMap[vertex] + weight) {
                 // Updating distance of v
 				distMap[n_vertex] = distMap[vertex] + weight;
@@ -93,7 +93,7 @@ void Graph::runDijkstra(string src) {
 }
 
 bool Graph::vertexExists(string vertex) {
-   if (distMap.find(vertex) == distMap.end()) {
+   if (distMap.count(vertex) == 0) {
        return false;
    }
    return true;
