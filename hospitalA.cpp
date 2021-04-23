@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "Hospital.h"
+#include "hospital.h"
 
 using namespace std;
 

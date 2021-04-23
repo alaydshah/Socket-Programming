@@ -1,6 +1,6 @@
 #include <string>
-#include "Graph.h"
-#include "Server.h"
+#include "graph.h"
+#include "server.h"
 
 using namespace std;
 

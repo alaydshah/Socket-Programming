@@ -16,7 +16,7 @@
 #include <string>
 #include <map>
 
-#include "Hospital.h"
+#include "hospital.h"
 
 using namespace std;
 
