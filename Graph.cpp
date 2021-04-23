@@ -16,7 +16,6 @@ using namespace std;
 typedef pair<float, string> Pair;
 typedef pair<string, string> Edge;
 string MAP_FILE_NAME = "map.txt";
-// float INF = 2147483647;
 
 // Constructor
 Graph::Graph(string s)

@@ -133,7 +133,7 @@ void receiveScores(int sockfd, int num_hospitals_sent, string& assigned_hospital
             }
             else if (stof(score) == best_score && stof(distance) < best_distance) {
                 best_distance = stof(distance);
-                assigned_hospital = hospital_names[i];
+                assigned_hospital = sender;
             }
         }
     }
