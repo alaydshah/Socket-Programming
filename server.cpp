@@ -20,6 +20,7 @@ using namespace std;
 
 void sigchld_handler(int s)
 {
+    // Note: This part of code was taken from Beej Socket Tutorial
     int saved_errno = errno;
     while(waitpid(-1, NULL, WNOHANG) > 0);
     errno = saved_errno;
@@ -32,6 +33,10 @@ Server::Server() {
 }
 
 const int Server::createSocket(string sockType, const char * port_number) {
+    /*
+    Creates a TCP or UDP socket based on the input socket Type and returns a file descriptor of the created socket.
+    Note: This part of code was taken from Beej Socket Tutorial
+    */
     int sockfd;
     struct addrinfo hints, *servinfo, *p;
     int rv;
@@ -89,6 +94,10 @@ const int Server::createSocket(string sockType, const char * port_number) {
 }
 
 string Server::receiveUDPPacket(int sockfd) {
+        /*
+        Receives UDP packet at the input socket file descriptor, and returns the message.
+        Note: This part of code was taken from Beej Socket Tutorial
+        */
         int numbytes;
         struct sockaddr_storage their_addr;
         char buf[MAXDATASIZE];
@@ -106,6 +115,10 @@ string Server::receiveUDPPacket(int sockfd) {
 }
 
 void Server::sendUDPPacket(int sockfd, string message, const char * port_number) {
+        /*
+        Sends input message through UDP using the input socket file descriptor and desination port number.
+        Note: This part of code was taken from Beej Socket Tutorial        
+        */
 
         struct addrinfo hints, *pAddr;
         int rv;
@@ -137,6 +150,10 @@ void Server::sendUDPPacket(int sockfd, string message, const char * port_number)
 }
 
 string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
+    /*
+    Accepts the TCP connection request at the input socket file descriptor, populates the child_sockfd at the given address location and returns the message.
+    Note: This part of code was taken from Beej Socket Tutorial
+    */
     int new_fd, numbytes;  
     struct sockaddr_storage their_addr;
     socklen_t sin_size;
@@ -180,6 +197,10 @@ string Server::receiveTCPRequest(const int sockfd, int * child_sockfd) {
 }
 
 void Server::respondTCPRequest(string response, int sockfd){
+    /*
+    Sends the response message to the scheduler through TCP using input socket file descriptor.
+    Note: This part of code was taken from Beej Socket Tutorial
+    */
     int numbytes;  
     struct addrinfo hints, *servinfo, *p;
     int rv;
@@ -193,6 +214,7 @@ void Server::respondTCPRequest(string response, int sockfd){
 
 void * Server::get_in_addr(struct sockaddr *sa)
 {
+    // Note: This part of code was taken from Beej Socket Tutorial
     if (sa->sa_family == AF_INET) {
         return &(((struct sockaddr_in*)sa)->sin_addr);
     }

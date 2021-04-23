@@ -29,7 +29,6 @@ Since it is a distributed client-server application, we need **five terminals** 
 
 Note that the hospitals expect `map.txt` input file. Kindly provide your map file in addition to the valid input arguments for successfully executing the code.
 
-
 &nbsp;
 ## Architecture Details:
 
@@ -85,7 +84,7 @@ These two functions in turn takes care of all the code logic, computations as we
 
 ### Driver: `hospitalA.cpp` &nbsp; `hospitalB.cpp` &nbsp; `hospitalC.cpp`
 
-These files rely on above explained hospital class for its entire functionality. It just acts as a driver code to initialze the class with input location, capacity, occupancy along with its hardcoded UDP port. 
+These files rely on above explained `hospital` class for its entire functionality. It just acts as a driver code to initialze the class with input location, capacity, occupancy along with its hardcoded UDP port. 
 
 The driver code infinitely calls the **listen** (blocking call) and **act** functions offerred by the hospital class infinitely until termination.
 
@@ -113,8 +112,3 @@ In order for the clients and server to decode the message successfully after eve
     * "_Hospital <A/B/C>:<score\>,<distance\>_"
 
 Note, all messages are of type **string**.
-
-
-
-
-

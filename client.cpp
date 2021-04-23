@@ -21,6 +21,15 @@ using namespace std;
 
 void *get_in_addr(struct sockaddr *sa);
 
+/*
+The main job of the client is to:
+1. Send Location to scheduler
+2. Wait for response
+3. When it gets one, it logs necessary messages in required format based on response it got.
+
+Most of the code below related to socket TCP communication were taken from Beej Socket Tutorial.
+*/
+
 int main(int argc, char *argv[])
 {
     int sockfd, numbytes;  

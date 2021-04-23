@@ -66,6 +66,10 @@ int main(void)
 }
 
 void getInitialOccupancy(int sockfd){
+    /*
+    Gets Initial Occupancy from Hospital Servers through UDP
+    Initialized book_keep dictionary for sending queries only to hospitals which have space to accomodate.
+    */
 
     for(int i=0; i<NUM_HOSPITALS; i++) {
         string message = server.receiveUDPPacket(sockfd);
@@ -77,7 +81,10 @@ void getInitialOccupancy(int sockfd){
 }
 
 void messageParser(string s, string& sender, string& var1, string& var2 ) {
-    
+    /*
+    Parses the input message based on the expected format.
+    Populates sender, var1 and var2 with the parsed values
+    */
     int split_index_1 = s.find(":"), split_index_2 = s.find(",");
     
     sender = s.substr(0, split_index_1);
@@ -90,12 +97,18 @@ void messageParser(string s, string& sender, string& var1, string& var2 ) {
 }
 
 string getClientRequest(const int sockfd, int * child_sockfd) {
+    /*
+    Receives the client location request through TCP.
+    */
     string location = server.receiveTCPRequest(sockfd, child_sockfd);
     printf("The Scheduler has received client at location %s from the client using TCP over port %s\n", location.c_str(), Port_Number[TCP]);
     return location;    
 }
 
 int sendLocationToHospital(int udp_sockfd, string location) {
+    /*
+    Sends the location request received from the clients through UDP to all the hospitals who have availability
+    */
     int counter = 0;
     for(int i=0; i<NUM_HOSPITALS; i++) {
         string hospital = hospital_names[i];
@@ -112,6 +125,11 @@ int sendLocationToHospital(int udp_sockfd, string location) {
 }
 
 void receiveScores(int sockfd, int num_hospitals_sent, string& assigned_hospital) {
+    /*
+    Receives scores from hospitals to whom the location request were sent through UDP.
+    While receiving message, it also decides on which location to allocate based on score.
+    Handles situations when score could not be computed or location was not valid based on score and distance received.
+    */
     float best_score = INT_MIN;
     float best_distance = INT_MAX;
     bool flag = false;
@@ -140,7 +158,10 @@ void receiveScores(int sockfd, int num_hospitals_sent, string& assigned_hospital
 }
 
 void assign(int tcp_sockfd, int udp_sockfd, string assigned_hospital) {
-
+    /*
+    Forwards the assignment to client which is either valid or None or Not Found.
+    If the assignment was made to any hospital, it also updates respective hospital by sending the "Assigned" message through UDP.
+    */
 
     if (assigned_hospital != "None" && assigned_hospital != "Not Found") {
         printf("The Scheduler has assigned %s to the client\n", assigned_hospital.c_str());

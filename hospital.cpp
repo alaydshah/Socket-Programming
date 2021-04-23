@@ -32,29 +32,50 @@ Hospital::Hospital(string hospital, string location, int capacity, int occupancy
 }
 
 void Hospital::bootUp() {
+    /*
+    Three tasks on bootup:
+    1. Creates a socket, 
+    2. Print the expected boot up message.  
+    3. Sending initial occupancy to scheduler through UDP
+    */
+
     this->sockfd = server.createSocket("UDP", this->port);
     printf ("Hospital %s is up and running using UDP on port %s.\n", this->hospital.c_str(), this->port);
     this->sendInitialOccupancy();
 }
 
 void Hospital::sendInitialOccupancy() {
+    /*
+    Sends Initial occupancy to scheduler through UDP socket.
+    */
     printf ("Hospital %s has total capacity %d and initial occupancy %d.\n", this->hospital.c_str(), this->capacity, this->occupancy);
     string msg = createMessage(to_string(this->capacity), to_string(this->occupancy));
     server.sendUDPPacket(sockfd, msg, SCHEDULER_PORT);
 }
 
 string Hospital::listen() {
+    /*
+    Listens on the respective UDP port (of respective hospital) expecting a message from scheduler.
+    */
     string message = server.receiveUDPPacket(sockfd);
     return message;
 }
 
 string Hospital::createMessage(string var1, string var2) {
+    /*
+    Prepares the message to be sent to the scheduler in the format the scheduler is expected to parse.
+    */
     std::stringstream msg;
     msg << "Hospital " << this->hospital << ":" << var1 << "," << var2;
     return msg.str();
 }
 
 void Hospital::act(string s) {
+    /*
+    The functions acts on message received from the scheduler. In short, it has either of the two actions to take:
+        1. If it is a query, then resolve the location query by computing score and distance
+        2. If it is a message informing that client was assigned to this hospital, then update the occupancy and availability.
+    */
     string delimiter = ":";
     int split_index = s.find(delimiter);
     string token_1 = s.substr(0, split_index); 
@@ -70,7 +91,11 @@ void Hospital::act(string s) {
 }
 
 void Hospital::resolveQuery(string location) {
-
+    /*
+    The functions conducts following two steps for resolve a location query:
+        1. Computes score and distance while handling edge cases and invalid requests
+        2. Sends the computed score and distance back to server through UDP.
+    */
     if (this->graph.vertexExists(location)) {
         float availability = this->getAvailability();
         string distance = this->getDistance(location);
@@ -91,6 +116,10 @@ void Hospital::resolveQuery(string location) {
 }
 
 string Hospital::getDistance(string source) {
+    /*
+    The heavy loading for this function which is to compute shortest path is in turn done by a function of the graph class.
+    Based on the computed distance, it returns either distance or None.
+    */
     float d = this->graph.getShortestPath(source);
     if (d > 0) {
         return to_string(d);
@@ -99,14 +128,25 @@ string Hospital::getDistance(string source) {
 }
 
 float Hospital::getAvailability() {
+    /*
+    Computes availability based on capacity and occupancy.
+    */
     return (float) (capacity - occupancy) / (float) capacity;
 }
 
 void Hospital::printGraph() {
+    /*
+    Prints the graph.
+    Note that this function was just implemented and used for debugging purpose. It is not called anywhere in the final codebase.
+    */
     this->graph.printGraph();
 }
 
 string Hospital::computeScore(string source) {
+    /*
+    Computes the score based on shortest path and availability.
+    Score could be None if shortest path or availability go out of specified limits.
+    */
     float d = this->graph.getShortestPath(source);
     float a = this->getAvailability();
 
@@ -119,6 +159,9 @@ string Hospital::computeScore(string source) {
 }
 
 void Hospital::updateAssignment() {
+    /*
+    Updates the occupancy, computes new availability based on updated occupany and logs them both on terminal. 
+    */
     occupancy++;
     float a = getAvailability();
     string availability;

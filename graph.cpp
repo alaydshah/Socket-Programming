@@ -26,6 +26,10 @@ Graph::Graph(string s)
 }
 
 void Graph::constructGraph() {
+    /*
+    Reads the map.txt file and constructs the graph representation out of it.
+    Graph is represented using a adjacency list map, where keys are nodes and values are list of adjacent nodes.
+    */
     string line;
     ifstream file(MAP_FILE_NAME);
 
@@ -43,8 +47,11 @@ void Graph::constructGraph() {
     }
 }
 
-void Graph::addEdge(string u, string v, float w)
-{
+void Graph::addEdge(string u, string v, float w) {
+    /*
+    Adds weighted edge to the adjacency list map. Since edges are undirected, it adds edge for both side of nodes.
+    */
+
     Edge edge = make_pair(u, v);
 
     // If both nodes have been encountered, that means we already visited that edge
@@ -59,6 +66,12 @@ void Graph::addEdge(string u, string v, float w)
 }
 
 void Graph::runDijkstra(string src) {
+    /*
+    Dijkstra's Algorithm. 
+    Kindly note that this algorithm implementation is partly inspired from the following source: 
+    https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/
+    */
+
     priority_queue< Pair, vector <Pair> , greater<Pair> > pq;
     pq.push(make_pair(0, src));
     distMap[src] = 0;
@@ -77,13 +90,15 @@ void Graph::runDijkstra(string src) {
 		pq.pop();
 		visited.insert(vertex);
         auto adjList = adjMap[vertex];
-		// // 'i' is used to get all adjacent vertices of a vertex
-		// list< pair<int, int> >::iterator i;
+
+        // Get all adjacent vertices of a vertex
         for (auto pair : adjMap[vertex]) {
             float weight = pair.first;
             string n_vertex = pair.second;
-            
+
+            //  If not visited before and there is shorter path to v through u.
             if ((visited.find(n_vertex) == visited.end()) && distMap[n_vertex] > distMap[vertex] + weight) {
+
                 // Updating distance of v
 				distMap[n_vertex] = distMap[vertex] + weight;
 				pq.push(make_pair(distMap[n_vertex], n_vertex));
@@ -93,6 +108,9 @@ void Graph::runDijkstra(string src) {
 }
 
 bool Graph::vertexExists(string vertex) {
+    /*
+    Check if given vertex exists in graph or not.
+    */
    if (distMap.count(vertex) == 0) {
        return false;
    }
@@ -100,10 +118,18 @@ bool Graph::vertexExists(string vertex) {
 }
 
 float Graph::getShortestPath(string destination) {
+    /*
+    distMap contains shortest path to any destination from source which is hospital location.
+    Query distmap and return the distance which will be shortest path distance.
+    */
     return distMap[destination];
 }
 
 void Graph::printGraph() {
+    /*
+    Prints the graph.
+    Note that this function was just implemented and used for debugging purpose. It is not called anywhere in the final codebase.
+    */
     map<string, list<Pair>>::iterator it;
 
     for (it = adjMap.begin(); it != adjMap.end(); it++)
@@ -118,7 +144,7 @@ void Graph::printGraph() {
         }
     }
 
-	// Print shortest distances stored in dist[]
+	
 	printf("Vertex Distance from Source\n");
     map<string, float>::iterator it2;
 

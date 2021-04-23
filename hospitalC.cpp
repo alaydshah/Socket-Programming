@@ -24,8 +24,8 @@ int main(int argc, char *argv[])
     Hospital hospital (HOSPITAL, location, capacity, occupancy, UDP_PORT);
 
     while (true) {
-        string message = hospital.listen();
-        hospital.act(message);
+        string message = hospital.listen(); // Listen for scheduler message
+        hospital.act(message);              // Act on the scheduler message
     }
 
     return 0;
