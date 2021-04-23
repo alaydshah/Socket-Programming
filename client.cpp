@@ -89,9 +89,11 @@ int main(int argc, char *argv[])
     string assignment(buf);
 
     if (assignment == "Not Found") {
+        printf("The client has received results from the Scheduler: assigned to Hospital None\n");
         printf("Location %s not found\n", argv[1]);
     }
     else if (assignment == "None") {
+        printf("The client has received results from the Scheduler: assigned to Hospital None\n");
         printf("Score = None, No assignment\n");
     }
     else {

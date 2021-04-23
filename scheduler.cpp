@@ -141,13 +141,19 @@ void receiveScores(int sockfd, int num_hospitals_sent, string& assigned_hospital
 
 void assign(int tcp_sockfd, int udp_sockfd, string assigned_hospital) {
 
-    printf("The Scheduler has assigned %s to the client\n", assigned_hospital.c_str());
-    server.respondTCPRequest(assigned_hospital, tcp_sockfd);
-    printf("The Scheduler has sent the result to client using TCP over port %s\n", Port_Number[TCP]);
 
     if (assigned_hospital != "None" && assigned_hospital != "Not Found") {
+        printf("The Scheduler has assigned %s to the client\n", assigned_hospital.c_str());
+        server.respondTCPRequest(assigned_hospital, tcp_sockfd);
+        printf("The Scheduler has sent the result to client using TCP over port %s\n", Port_Number[TCP]);
         server.sendUDPPacket(udp_sockfd, "Assigned", Port_Number[hospitalPort[assigned_hospital]]);
         book_keep[assigned_hospital] -= 1;
         printf("The Scheduler has sent the result to %s using UDP over port %s\n", assigned_hospital.c_str(), Port_Number[UDP]);
+    }
+    else {
+        printf("The Scheduler couldn't assign any Hospital to the client\n");
+        server.respondTCPRequest(assigned_hospital, tcp_sockfd);
+        printf("The Scheduler has sent the result to client using TCP over port %s\n", Port_Number[TCP]);
+
     }
 }
