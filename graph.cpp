@@ -1,5 +1,3 @@
-//g++ -std=c++11 -o trial.o trial.cpp
-
 #include <bits/stdc++.h>
 #include <algorithm>
 #include <iostream>
