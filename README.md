@@ -1,9 +1,5 @@
 # Socket-Programming
 
-## Author:
-**Name:** Alay Dilipbhai Shah <br>
-**USC Student ID:** 4038948819
-
 ## Compile and Execute:
 
 Kindly run the following command in the terminal to compile the code and generate executable files.
@@ -112,16 +108,4 @@ In order for the clients and server to decode the message successfully after eve
     * "_Hospital <A/B/C>:<score\>,<distance\>_"
 
 Note, all messages are of type **string**.
-
-&nbsp;
-
-## Re-used Code:
-1. `client.cpp`: <br>
-Most of the code below related to socket TCP communication were taken from **Beej Socket Tutorial.**
-
-2. `server.cpp`: <br>
-This class was created to separate communication functions from rest of the code and have it in all place. Most of the functionalities in this class are implemented using code snippets from **Beej Socket Tutorial.**
-
-1. `graph.cpp`: <br>
-This class was created to separate graph related computations from other computations. Shortest path distance computation which was done using **Dijkstra's algorithm** was majorly inspired from this source: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-priority_queue-stl/.
 
